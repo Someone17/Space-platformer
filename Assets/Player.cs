@@ -7,6 +7,8 @@ public class Player : MonoBehaviour
 {
     public Rigidbody2D myRigidbody;
 
+    public ParticleSystem jumpVFX;
+
     public SOPlayerSetUp soPlayerSetUp;
     /*[Header("Speed setup")]
     public Vector2 friction = new Vector2(.1f, 0);
@@ -31,6 +33,11 @@ public class Player : MonoBehaviour
     private Animator _currentPlayer;
     public Ease ease =  Ease.OutBack;
 
+    [Header("Jump Collision Check")]
+    public Collider2D collider2D;
+    public float distToGround;
+    public float spaceToGround = .1f;
+
     private float _currentSpeed;
     
     public HealthBase healthBase;
@@ -40,6 +47,15 @@ public class Player : MonoBehaviour
             healthBase.OnKill += OnPlayerKill;
         }
         _currentPlayer = Instantiate(soPlayerSetUp.player, transform);
+
+        if(GetComponent<Collider2D>() != null){
+            distToGround = GetComponent<Collider2D>().bounds.extents.y;
+        }
+    }
+
+    private bool IsGrounded(){
+        Debug.DrawRay(transform.position, -Vector2.up, Color.magenta, distToGround + spaceToGround);
+        return Physics2D.Raycast(transform.position, -Vector2.up, distToGround + spaceToGround);
     }
 
     private void OnPlayerKill(){
@@ -49,6 +65,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        IsGrounded();
         HandleJump();
         HandleMovement();
 
@@ -95,7 +112,7 @@ public class Player : MonoBehaviour
     }
 
     private void HandleJump(){
-        if(Input.GetKey(KeyCode.UpArrow)){
+        if(Input.GetKey(KeyCode.UpArrow) && IsGrounded()){
             myRigidbody.velocity = Vector2.up * soPlayerSetUp.forceJump;
             myRigidbody.transform.localScale = Vector2.one;
 
@@ -104,10 +121,15 @@ public class Player : MonoBehaviour
             DOTween.Kill(myRigidbody.transform);
 
             HandleScaleJump();
+            PlayJumpVFX();
         }
         else{
             _currentPlayer.SetBool(soPlayerSetUp.boolJump, false);
         }
+    }
+
+    private void PlayJumpVFX(){
+        if(jumpVFX != null) jumpVFX.Play();
     }
 
     private void HandleScaleJump(){

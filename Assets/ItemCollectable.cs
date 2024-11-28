@@ -6,6 +6,11 @@ public class ItemCollectable : MonoBehaviour
 {
     [SerializeField] private string compareTag = "Player";
    
+    [Header("Sounds")]
+    public AudioSource audioSource;
+
+    public ParticleSystem particleSystem;
+
     private void OnTriggerEnter2D(Collider2D other){
         if(other.transform.CompareTag(compareTag)){
             Collect();
@@ -23,5 +28,7 @@ public class ItemCollectable : MonoBehaviour
    protected virtual void OnCollect()
     {
         ItemManager.Instance.AddCoins();
+        if(audioSource != null) audioSource.Play();
+        if(particleSystem != null) particleSystem.Play();
     }
 }
