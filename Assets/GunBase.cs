@@ -14,10 +14,13 @@ public class GunBase : MonoBehaviour
 
     public Transform playerSideReference;
 
+    public AudioSource soundSource;
+
     private void Update()
     {
         if(Input.GetKeyDown(KeyCode.M)){
            _currentCoroutine = StartCoroutine(StartShoot());
+           PlaySoundSource();
         }
         if(Input.GetKeyUp(KeyCode.M)){
             if(_currentCoroutine != null) 
@@ -37,5 +40,9 @@ public class GunBase : MonoBehaviour
         var projectile = Instantiate(Projectile);
         projectile.transform.position = positionToShoot.position; 
         projectile.side = playerSideReference.transform.localScale.x;
+    }
+
+    private void PlaySoundSource(){
+        if(soundSource != null) soundSource.Play();
     }
 }
